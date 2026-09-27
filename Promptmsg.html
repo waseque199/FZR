@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>I'm sorry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep: #241B2F;
+    --bg-deep-2: #2E2238;
+    --rose: #E7A6A0;
+    --rose-soft: #D98F8F;
+    --cream: #F7EFE9;
+    --gold: #D4AF7A;
+    --muted: #C9BFD1;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    height: 100%;
+    margin: 0;
+  }
+
+  body{
+    background: radial-gradient(circle at 30% 20%, var(--bg-deep-2), var(--bg-deep) 70%);
+    color: var(--cream);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 24px;
+  }
+
+  .stage{
+    position: relative;
+    width: 100%;
+    max-width: 560px;
+    min-height: 420px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ---------- Question screen ---------- */
+  .question{
+    text-align: center;
+    width: 100%;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .question.hidden{
+    opacity: 0;
+    transform: scale(0.96);
+    pointer-events: none;
+    position: absolute;
+  }
+
+  .eyebrow{
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    margin-bottom: 18px;
+  }
+
+  .question h1{
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: clamp(2.1rem, 6vw, 3rem);
+    line-height: 1.25;
+    margin: 0 0 10px;
+    color: var(--cream);
+  }
+
+  .plea{
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--rose);
+    min-height: 1.6em;
+    margin-bottom: 44px;
+    transition: opacity 0.3s ease;
+  }
+
+  .choices{
+    position: relative;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 22px;
+  }
+
+  /* Yes always left, No always right, until dodging kicks in */
+  .yes-btn{ order: 1; }
+  .no-btn{ order: 2; }
+
+  button{
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    border-radius: 999px;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+  }
+
+  .yes-btn{
+    background: var(--rose-soft);
+    color: #2A1A1E;
+    font-weight: 500;
+    padding: 14px 34px;
+    box-shadow: 0 6px 20px rgba(217, 143, 143, 0.35);
+  }
+
+  .yes-btn:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px rgba(217, 143, 143, 0.45);
+  }
+
+  .no-btn{
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid rgba(201, 191, 209, 0.4);
+    padding: 13px 30px;
+  }
+
+  .no-btn.dodging{
+    position: absolute;
+  }
+
+  .no-btn:hover{
+    color: var(--cream);
+    border-color: var(--muted);
+  }
+
+  /* ---------- Forgiven screen ---------- */
+  .forgiven{
+    text-align: center;
+    width: 100%;
+    opacity: 0;
+    transform: scale(0.97);
+    pointer-events: none;
+    position: absolute;
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .forgiven.visible{
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+    position: relative;
+  }
+
+  .heart{
+    width: 46px;
+    height: 46px;
+    margin: 0 auto 26px;
+    opacity: 0;
+    transform: scale(0.6);
+    transition: opacity 0.6s ease 0.2s, transform 0.6s ease 0.2s;
+  }
+
+  .forgiven.visible .heart{
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .forgiven h2{
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: clamp(1.8rem, 5vw, 2.4rem);
+    margin: 0 0 20px;
+    color: var(--gold);
+  }
+
+  .forgiven p{
+    font-size: 1.02rem;
+    line-height: 1.75;
+    color: var(--cream);
+    max-width: 440px;
+    margin: 0 auto 16px;
+  }
+
+  .signature{
+    margin-top: 28px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.2rem;
+    color: var(--rose);
+  }
+</style>
+</head>
+<body>
+
+  <div class="stage">
+
+    <div class="question" id="question">
+      <div class="eyebrow">for you</div>
+      <h1>Have you forgiven me?</h1>
+      <div class="plea" id="plea"></div>
+      <div class="choices">
+        <button class="yes-btn" id="yesBtn" onclick="sayYes()">Yes</button>
+        <button class="no-btn" id="noBtn" onclick="dodge()">No</button>
+      </div>
+    </div>
+
+    <div class="forgiven" id="forgiven">
+      <svg class="heart" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 21s-7.5-4.6-10.2-9.2C0.2 8.7 1.6 5 5.2 4.2c2.1-.5 4 .5 5 2.3.9-1.8 2.9-2.8 5-2.3 3.6.8 5 4.5 3.4 7.6C19.5 16.4 12 21 12 21z"
+          stroke="#D4AF7A" stroke-width="1.4" fill="rgba(212,175,122,0.15)"/>
+      </svg>
+      <h2>Thank you.</h2>
+      <p>
+        I know I hurt you, and I don't take that lightly. You mean more to me than I showed,
+        and I'm going to keep proving that — not just with words, but with how I treat you from here on.
+      </p>
+      <p>
+        Thank you for giving me the chance to be better for you.
+      </p>
+      <div class="signature">— Waseque ♥</div>
+    </div>
+
+  </div>
+
+<script>
+  const pleas = [
+    "",
+    "Please? I mean it.",
+    "Take your time — I'll still be here.",
+    "I really am sorry.",
+    "One more chance, that's all I ask.",
+    "I'm not going anywhere."
+  ];
+
+  let dodgeCount = 0;
+  const noBtn = document.getElementById('noBtn');
+  const yesBtn = document.getElementById('yesBtn');
+  const pleaEl = document.getElementById('plea');
+  const choices = document.querySelector('.choices');
+
+  function dodge(){
+    // capture the button's current on-screen spot before freeing it from flow,
+    // so the very first dodge doesn't jump from a different position
+    if (!noBtn.classList.contains('dodging')) {
+      const rect = noBtn.getBoundingClientRect();
+      const parentRect = choices.getBoundingClientRect();
+      noBtn.style.left = (rect.left - parentRect.left) + 'px';
+      noBtn.style.top = (rect.top - parentRect.top) + 'px';
+      noBtn.classList.add('dodging');
+    }
+
+    dodgeCount++;
+
+    // move the No button to a random safe spot within the choices row
+    const maxX = choices.clientWidth - noBtn.offsetWidth - 10;
+    const maxY = choices.clientHeight - noBtn.offsetHeight;
+    const x = Math.random() * Math.max(maxX, 0);
+    const y = (Math.random() - 0.5) * Math.max(maxY, 0);
+
+    noBtn.style.left = x + 'px';
+    noBtn.style.top = (choices.clientHeight / 2 - noBtn.offsetHeight / 2 + y) + 'px';
+
+    // gently grow the Yes button so it's easier to say yes
+    const scale = Math.min(1 + dodgeCount * 0.06, 1.4);
+    yesBtn.style.transform = `scale(${scale})`;
+
+    const message = pleas[Math.min(dodgeCount, pleas.length - 1)];
+    pleaEl.style.opacity = 0;
+    setTimeout(() => {
+      pleaEl.textContent = message;
+      pleaEl.style.opacity = 1;
+    }, 150);
+  }
+
+  function sayYes(){
+    document.getElementById('question').classList.add('hidden');
+    document.getElementById('forgiven').classList.add('visible');
+  }
+</script>
+
+</body>
+</html>
